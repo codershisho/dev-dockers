@@ -1,0 +1,36 @@
+version: '3'
+
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx-1.25
+    tty: true
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./logs/nginx:/var/log/nginx/
+    depends_on:
+      - php
+      - node
+  
+  php:
+    build: ./php
+    container_name: php-8.2-fpm
+    tty: true
+    volumes:
+      - .:/var/www
+  
+  node:
+    build: ./node
+    container_name: node-18.18.0-alpine
+    tty: true
+    environment:
+      - NODE_ENV=development
+      - HOST=0.0.0.0
+      - CHOKIDAR_USEPOLLING=true
+    ports:
+      - 3000:3000
+    volumes:
+      - .:/var/www
