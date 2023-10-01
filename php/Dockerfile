@@ -8,6 +8,18 @@ RUN apt-get update && \
 
 COPY ./php.ini /usr/local/etc/php/php.ini
 
-COPY --from=composer:2.0 /usr/bin/composer /usr/bin/composer
+#Composer install
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+RUN php composer-setup.php
+RUN php -r "unlink('composer-setup.php');"
+RUN mv composer.phar /usr/local/bin/composer
+
+ENV COMPOSER_ALLOW_SUPERUSER 1
+
+ENV COMPOSER_HOME /composer
+
+ENV PATH $PATH:/composer/vendor/bin
 
 WORKDIR /var/www
+
+RUN composer global require "laravel/installer"
